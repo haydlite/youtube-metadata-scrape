@@ -28,14 +28,17 @@ class YouTubeScraper:
     YOUTUBE_VIDEO_PREFIX = 'https://www.youtube.com/watch?v='
 
     @classmethod
-    def video_code(self, youtube_url):
-        """Return video code of given YouTube URL."""
-        return youtube_url[youtube_url.rindex('/')+1:]
-
-    @classmethod
-    def lengthen_url(self, youtube_url):
-        """Return the full URL of shortened YouTube URL."""
-        return self.YOUTUBE_VIDEO_PREFIX + self.video_code(youtube_url)
+    def standardize_URL(self, youtube_url):
+        """Return YouTube URL in standard form."""
+        if '?v=' in youtube_url:
+            video_code_index = youtube_url.find('?v=') + 3
+            if '&' in youtube_url[video_code_index:]:
+                video_code_index_end = youtube_url.find('&')
+                video_code = youtube_url[video_code_index:video_code_index_end]
+            video_code = youtube_url[video_code_index]
+        else:
+            video_code = youtube_url[youtube_url.rindex('/')+1:]
+        return self.YOUTUBE_VIDEO_PREFIX + video_code
 
     @classmethod
     def find_metadata_variable_value(self, soup, metadata_variable_to_find,
@@ -84,11 +87,7 @@ if __name__ == "__main__":
 
         for url in urls_to_scrape:
             if 'youtu' in url:
-                if '-' not in url:  # If URL is shortened form
-                    url = YouTubeScraper.lengthen_url(url)
-                elif '&' in url:
-                    ampersand_index = url.find('&')
-                    url = url[:ampersand_index]
+                url = YouTubeScraper.standardize_URL(url)
 
                 response = requests.get(url,
                                         headers={'User-Agent': 'Mozilla/5.0'})
