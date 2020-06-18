@@ -36,7 +36,7 @@ class YouTubeScraper:
                 video_code_index_end = youtube_url.find('&')
                 video_code = youtube_url[video_code_index:video_code_index_end]
             else:
-                video_code = youtube_url[video_code_index]
+                video_code = youtube_url[video_code_index:]
         else:
             video_code = youtube_url[youtube_url.rindex('/')+1:]
         return self.YOUTUBE_VIDEO_PREFIX + video_code
