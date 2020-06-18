@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 """Scraping YouTube Videoes for Set of Metadata."""
 
-# TODO: Determine all URL types
-# TODO: Determine why 'schema.org'?
-
-# TODO: Check out all the NAs
-
 import csv
 import requests
 import sys
@@ -131,7 +126,4 @@ if __name__ == "__main__":
 
             writer.writerow(row_values)
 
-# title = find_title(page)
-
-# 1.5 hr
-# 5:40 -  9:10 4hr - 11
+# total 8.5 hours
