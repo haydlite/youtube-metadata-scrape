@@ -61,8 +61,11 @@ class YouTubeScraper:
                                variable_identifier_offset
 
         relevant_html_str_cut = relevant_html_str[variable_start_index:]
-
-        variable_end_index = relevant_html_str_cut.find('\\",\\"')
+        
+        if metadata_variable_to_find == 'uploadDate':
+            variable_end_index = relevant_html_str_cut.find('\\"')
+        else:
+            variable_end_index = relevant_html_str_cut.find('\\",\\"')
         variable_value = relevant_html_str_cut[:variable_end_index]
 
         return variable_value
