@@ -6,12 +6,11 @@
 
 # TODO: Check out all the NAs
 
-import pandas as pd
-
 import csv
 import requests
 import sys
 
+import pandas as pd
 from bs4 import BeautifulSoup
 
 RELEVANT_METADATA = ['ownerChannelName',
@@ -42,17 +41,20 @@ class YouTubeScraper:
         return self.YOUTUBE_VIDEO_PREFIX + video_code
 
     @classmethod
-    def find_metadata_variable_value(self, soup, metadata_variable_to_find,
-                                     alt=False):
+    def find_metadata_variable_value(self, soup, metadata_variable_to_find):
         """Pass finds metadata variable on YouTube video's page."""
         variable_identifier_string = '{}\\":\\"'.\
                                      format(metadata_variable_to_find)
         variable_identifier_offset = len(variable_identifier_string)
+        
+        potential_metadata_blob_1 = soup.find_all('script')[13].text
+        potential_metadata_blob_2 = soup.find_all('script')[12].text
 
-        if alt:
-            relevant_html_str = soup.find_all('script')[12].text
+        if ("http://schema.org" in potential_metadata_blob_1) or \
+            ("https://schema.org" in potential_metadata_blob_1):
+            relevant_html_str = potential_metadata_blob_2
         else:
-            relevant_html_str = soup.find_all('script')[13].text
+            relevant_html_str = potential_metadata_blob_1
 
         variable_start_index = relevant_html_str.\
                                find(variable_identifier_string) + \
@@ -60,7 +62,7 @@ class YouTubeScraper:
 
         relevant_html_str_cut = relevant_html_str[variable_start_index:]
 
-        variable_end_index = relevant_html_str_cut.find('\\"')
+        variable_end_index = relevant_html_str_cut.find('\\",\\"')
         variable_value = relevant_html_str_cut[:variable_end_index]
 
         return variable_value
@@ -89,21 +91,14 @@ if __name__ == "__main__":
         for url in urls_to_scrape:
             if 'youtu' in url:
                 url = YouTubeScraper.standardize_URL(url)
-
                 response = requests.get(url,
                                         headers={'User-Agent': 'Mozilla/5.0'})
                 soup = BeautifulSoup(response.text, features="html.parser")
                 metadata_values = {}
-                is_alt = False
 
                 for var in RELEVANT_METADATA:
                     metadata_values[var] = YouTubeScraper.\
-                        find_metadata_variable_value(soup, var, is_alt)
-                    if (('https://schema.org' in metadata_values[var]) or
-                       ('http://schema.org' in metadata_values[var])):
-                        is_alt = True
-                        metadata_values[var] = YouTubeScraper.\
-                            find_metadata_variable_value(soup, var, is_alt)
+                        find_metadata_variable_value(soup, var)
 
                 if (not metadata_values['viewCount']) or \
                    ('window' in metadata_values['viewCount']):
@@ -136,4 +131,4 @@ if __name__ == "__main__":
 # title = find_title(page)
 
 # 1.5 hr
-# 5:40 -  9:10 4hr
+# 5:40 -  9:10 4hr - 11
