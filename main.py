@@ -8,6 +8,7 @@ import sys
 import pandas as pd
 from bs4 import BeautifulSoup
 
+
 RELEVANT_METADATA = ['ownerChannelName',
                      'title',
                      'viewCount',
@@ -37,7 +38,7 @@ class YouTubeScraper:
 
     @classmethod
     def find_metadata_variable_value(self, soup, metadata_variable_to_find):
-        """Pass finds metadata variable on YouTube video's page."""
+        """Finds and returns metadata variable on a YouTube video's page."""
         variable_identifier_string = '{}\\":\\"'.\
                                      format(metadata_variable_to_find)
         variable_identifier_offset = len(variable_identifier_string)
@@ -67,7 +68,7 @@ class YouTubeScraper:
 
 
 def null_row_values(url):
-    """Return nulled row values."""
+    """Return dictionary with metadata key values and null values."""
     return {'URL': url,
             'Title': 'N/A',
             'Creator': 'N/A',
@@ -125,5 +126,3 @@ if __name__ == "__main__":
                 row_values = null_row_values(url)
 
             writer.writerow(row_values)
-
-# total 8.5 hours
